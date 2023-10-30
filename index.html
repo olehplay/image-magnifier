@@ -1,0 +1,112 @@
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/basiclightbox@5.0.4/dist/basicLightbox.min.css"
+/>
+<style>
+  .custom-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
+    list-style: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .gallery__item {
+    cursor: pointer;
+    max-width: 550px;
+    margin: 5px;
+    position: relative;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
+      0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+  }
+
+  .gallery__image:hover {
+    transform: scale(1.03);
+  }
+
+  .gallery__image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform cubic-bezier(0.4, 0, 0.2, 1) 250ms;
+  }
+
+  .gallery__link {
+    display: block;
+    text-decoration: none;
+    height: 100%;
+  }
+
+  .gallery__link:hover {
+    cursor: zoom-in;
+  }
+</style>
+
+<div class="custom-gallery"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/basiclightbox@5.0.4/dist/basicLightbox.min.js"></script>
+<script>
+  const galleryItems = [
+    {
+      image:
+        "https://images.theconversation.com/files/442675/original/file-20220126-17-1i0g402.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=1356&h=668&fit=crop",
+    },
+    // Add more image objects here
+  ];
+
+  const galleryRef = document.querySelector(".custom-gallery");
+
+  const galleryMarkup = createImgMarkup(galleryItems);
+  galleryRef.insertAdjacentHTML("beforeend", galleryMarkup);
+
+  galleryRef.addEventListener("click", onImgContainerClick);
+
+  const lightbox = basicLightbox.create('<img width="800" height="600">', {
+    onShow: (instance) => {
+      window.addEventListener("keydown", onModalClose);
+    },
+    onClose: (instance) => {
+      window.removeEventListener("keydown", onModalClose);
+    },
+  });
+
+  function createImgMarkup(imgs) {
+    return imgs
+      .map(
+        ({ image }) => `
+        <div class="gallery__item">
+          <a class="gallery__link" href="${image}">
+            <img
+              class="gallery__image"
+              src="${image}"
+              data-source="${image}"
+              alt="content"
+            />
+          </a>
+        </div>
+      `
+      )
+      .join("");
+  }
+
+  function onModalClose(evt) {
+    if (evt.code === "Escape") {
+      lightbox.close();
+    }
+  }
+
+  function onImgContainerClick(event) {
+    event.preventDefault();
+
+    if (event.target.classList.contains("gallery__image")) {
+      const imgBigUrl = event.target.dataset.source;
+      if (imgBigUrl) {
+        const imgElement = lightbox.element().querySelector("img");
+        imgElement.setAttribute("src", imgBigUrl);
+        lightbox.show();
+      }
+    }
+  }
+</script>
