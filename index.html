@@ -43,41 +43,40 @@
     cursor: zoom-in;
   }
 </style>
+<body onload="onPageLoad()">
+  <div class="custom-gallery"></div>
 
-<div class="custom-gallery"></div>
+  <script src="https://cdn.jsdelivr.net/npm/basiclightbox@5.0.4/dist/basicLightbox.min.js"></script>
+  <script>
+    let onPageLoad = () => {
+      const galleryItems = [
+        {
+          image:
+            "https://images.theconversation.com/files/442675/original/file-20220126-17-1i0g402.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=1356&h=668&fit=crop",
+        },
+        // Add more image objects here
+      ];
 
-<script src="https://cdn.jsdelivr.net/npm/basiclightbox@5.0.4/dist/basicLightbox.min.js"></script>
-<script>
-  
-  // ================ CHANGE IMAGE URL ========================
-  const galleryItems = [
-    {
-      image:
-        "https://images.theconversation.com/files/442675/original/file-20220126-17-1i0g402.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=1356&h=668&fit=crop",
-    },
-    // Add more image objects here
-  ];
+      const galleryRef = document.querySelector(".custom-gallery");
 
-  const galleryRef = document.querySelector(".custom-gallery");
+      const galleryMarkup = createImgMarkup(galleryItems);
+      galleryRef.insertAdjacentHTML("beforeend", galleryMarkup);
 
-  const galleryMarkup = createImgMarkup(galleryItems);
-  galleryRef.insertAdjacentHTML("beforeend", galleryMarkup);
+      galleryRef.addEventListener("click", onImgContainerClick);
 
-  galleryRef.addEventListener("click", onImgContainerClick);
+      const lightbox = basicLightbox.create('<img width="800" height="600">', {
+        onShow: (instance) => {
+          window.addEventListener("keydown", onModalClose);
+        },
+        onClose: (instance) => {
+          window.removeEventListener("keydown", onModalClose);
+        },
+      });
 
-  const lightbox = basicLightbox.create('<img width="800" height="600">', {
-    onShow: (instance) => {
-      window.addEventListener("keydown", onModalClose);
-    },
-    onClose: (instance) => {
-      window.removeEventListener("keydown", onModalClose);
-    },
-  });
-
-  function createImgMarkup(imgs) {
-    return imgs
-      .map(
-        ({ image }) => `
+      function createImgMarkup(imgs) {
+        return imgs
+          .map(
+            ({ image }) => `
         <div class="gallery__item">
           <a class="gallery__link" href="${image}">
             <img
@@ -89,26 +88,28 @@
           </a>
         </div>
       `
-      )
-      .join("");
-  }
-
-  function onModalClose(evt) {
-    if (evt.code === "Escape") {
-      lightbox.close();
-    }
-  }
-
-  function onImgContainerClick(event) {
-    event.preventDefault();
-
-    if (event.target.classList.contains("gallery__image")) {
-      const imgBigUrl = event.target.dataset.source;
-      if (imgBigUrl) {
-        const imgElement = lightbox.element().querySelector("img");
-        imgElement.setAttribute("src", imgBigUrl);
-        lightbox.show();
+          )
+          .join("");
       }
-    }
-  }
-</script>
+
+      function onModalClose(evt) {
+        if (evt.code === "Escape") {
+          lightbox.close();
+        }
+      }
+
+      function onImgContainerClick(event) {
+        event.preventDefault();
+
+        if (event.target.classList.contains("gallery__image")) {
+          const imgBigUrl = event.target.dataset.source;
+          if (imgBigUrl) {
+            const imgElement = lightbox.element().querySelector("img");
+            imgElement.setAttribute("src", imgBigUrl);
+            lightbox.show();
+          }
+        }
+      }
+    };
+  </script>
+</body>
